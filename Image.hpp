@@ -18,6 +18,7 @@ class Image{
 
         inline size_t width() const {return m_width;}
         inline size_t height() const {return m_height;}
+        inline std::vector<Vec3f> pixels() const {return m_pixels;}
 
         inline const Vec3f &operator() (size_t x, size_t y) const {return m_pixels[y*m_width + x];}
         inline Vec3f &operator() (size_t x, size_t y) {return m_pixels[y*m_width + x];}
@@ -27,10 +28,10 @@ class Image{
             if (!out){
                 std::cerr << "Cannot open file " << filename.c_str() << std::endl;
             }
-            std::cout << "test" << std::endl;
             out << "P3" << std::endl
                 << m_width << " " << m_height << std::endl
                 << "255" << std::endl;
+
             for (size_t y = 0; y < m_height; y++){
                 for (size_t x = 0; x<m_width; x++){
                     out << std::min(255u, static_cast<unsigned int>(255.f * m_pixels[y * m_width + x][0])) << " "
@@ -41,9 +42,26 @@ class Image{
             }
             out.close();
         }
+
+        // void saveJPG(const char *filename) {
+        //     auto image_to_write = new unsigned char[m_height*m_width*3];
+        //     #pragma omp parallel for 
+        //     for (size_t y = 0; y < m_height; y++){
+        //         #pragma omp parallel for
+        //         for (size_t x = 0; x<m_width; x++){
+        //             image_to_write[(y * m_width + x)*3 + 0] = std::min(255u, static_cast<unsigned int>(255.f * m_pixels[y * m_width + x][0]));
+        //             image_to_write[(y * m_width + x)*3 + 1] = std::min(255u, static_cast<unsigned int>(255.f * m_pixels[y * m_width + x][1]));
+        //             image_to_write[(y * m_width + x)*3 + 2] = std::min(255u, static_cast<unsigned int>(255.f * m_pixels[y * m_width + x][2]));
+        //         }
+        //     }
+        //     stbi_write_jpg("image.jpg", m_width, m_height, 3, image_to_write, 0);
+        // }
+
         void fillBackground(const Vec3f &color = Vec3f(0.f,0.f,1.f)) {
+            // #pragma omp parallel for 
             for (size_t y = 0; y < m_height; y++)
             {
+                // #pragma omp parallel for
                 for (size_t x = 0; x < m_width; x++)
                 {
                     static const Vec3f color0 (0.1f,.2f,.8f);
